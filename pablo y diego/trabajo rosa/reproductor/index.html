@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Reproductor </title>
+	<style type="text/css">
+body{ font-size:1em; font-family:Arial, Helvetica, sans-serif; text-align:center;}
+button{ min-width: 85px;  display: inline-block; background-color:green; color:white; font-size:10px !important;
+border-radius: 10px; padding:10px;}
+button:hover{ box-shadow:0px 0px 3px #000;}
+#player{ position:relative;}
+#controles{ position:relative; bottom:0; width:100%; background-color:none; }
+#myTime{ display:block;}
+#myMin, #total{ display:inline-block; font-weight:bold;}
+#durationVideo{ width:500px; background-color:#999;}
+input[type='range'] {
+    -webkit-appearance: none !important;
+    background:blue;
+    height:7px;
+}
+input[type='range']::-webkit-slider-thumb {
+    -webkit-appearance: none !important;
+	border-radius:50%;
+    background:red;
+    height:15px;
+    width:15px;
+}
+.ampliado{ width:100%; background-color:black;}
+	</style>
+	<script type="text/javascript" src="js/jquery-1.11.3.min.js"></script>
+	<script type="text/javascript">
+	function play(){
+		if(media.paused){
+		media.play();
+		}
+		else{
+		media.pause();
+		}
+		
+	}
+	function stop(){
+		media.load();
+		media.pause();
+		media.currentTime = 0;
+		
+		durationVideo.value = media.currentTime;
+		res.innerHTML = "0 : 00";
+	}
+
+	 function skip(value) {
+        var video = document.getElementById("media");
+        video.currentTime += value;
+    }      	
+	function volume(vol){
+		document.getElementById('media').volume += vol
+	}	
+	function mute(){
+		if(document.getElementById('media').volume == 0){
+			document.getElementById('media').volume += 1.0;}else{document.getElementById('media').volume = 0;
+			}
+		}
+	
+	//esta funcion va a invocarse cuando carga la pagina "body onload"; la misma q tiene otras funciones que se invocan dentro
+	function cargaPage(){
+	
+	
+		var video = document.getElementById("media");
+			var p = document.getElementById("durationVideo");
+			res = document.getElementById("result");
+
+		//video.poster= "img/poster.jpg";
+		//video.autoplay = true;
+		
+		var seconds = 0;
+		var rango = 60
+		var mints = 0;
+		function updateTime(evt) {
+			var myTime = document.getElementById("myTime");
+			var actualTime = ""+media.currentTime;
+
+			factualTime = actualTime.substring(0, actualTime.indexOf('.'));
+			
+			s =factualTime;
+			//secondWin = checkSeconds(s);
+			p.value = media.currentTime;
+			nMints =    Math.floor(p.value/60);
+				  nRestajeDeSeconds = (rango*nMints);
+				  win = p.value-nRestajeDeSeconds;
+				  winOk =checkSeconds(win)
+				  
+				  res.innerHTML = nMints+" : "+winOk;
+				  
+				  function checkSeconds(i)	{
+					if (i<10) {i="0" + i;}return i;
+					}
+			//pp.setAttribute("value", media.currentTime);
+			
+			myTime.innerHTML ="CONTANDO SEGUNDOS EN ENTEROS: "+s;
+			mints = Math.floor(s/rango);
+			restajeDeSeconds = (rango*mints)
+			secondWin = s-restajeDeSeconds
+			
+			segundosOK = checkSeconds(secondWin);
+			
+			myMin.innerHTML = mints+" : "+segundosOK;		
+			
+			media.addEventListener("timeupdate", updateTime);
+			
+			function checkSeconds(i)	{
+				if (i<10) {i="0" + i;}return i;
+			}
+		}
+		updateTime();
+		
+		function slider(){
+			p.addEventListener("input", function() {
+				
+			      nMints =    Math.floor(p.value/60);
+				  nRestajeDeSeconds = (rango*nMints);
+				  win = p.value-nRestajeDeSeconds;
+				  winOk =checkSeconds(win)
+				  
+				  res.innerHTML = nMints+" : "+winOk;
+				  
+				  function checkSeconds(i)	{
+					if (i<10) {i="0" + i;}return i;
+					}
+			//media cambia segun cambie range slider
+			media.currentTime = p.value;
+			}, false); 
+		}	
+		slider(); 
+		
+		function durationTotal(){
+			var total = document.getElementById("total");
+			total.innerHTML = media.duration;
+			}
+		durationTotal();
+		
+		function volumeSlider(){
+		var v = document.getElementById("volumeSlider");
+			resa = document.getElementById("resultAudio");
+			
+			document.getElementById("volumeSlider").value = media.volume*100;
+			resa.innerHTML =Math.floor((media.volume)*100);
+			
+			
+			media.addEventListener("volumechange", volumeSlider);
+			
+			v.addEventListener("input", function() {
+			resa.innerHTML = v.value;
+			media.volume= (v.value)/100;
+			}, false); 
+		}	
+		volumeSlider()
+/*mio*/
+	$('#durationVideo').attr('value',0)
+	$('#durationVideo').attr('max',media.duration)
+/**/
+		}
+	
+	var cc = 0;	
+		
+	function ampliar(e){
+		$('video').toggleClass("ampliado");
+		if(cc==0){
+			$(e).html('reducir')
+			cc++;
+			}
+			else{
+			$(e).html('ampliar');
+			cc = 0;	
+			}
+		}	
+
+/**/
+
+	</script>
+	
+</head>
+<body onload="cargaPage()">
+	<section id="player">
+	<video id="media" width="720" height="480"  poster= "img/poster.jpg" >
+		<source src="video/modulo.mp4" type="video/mp4">
+	</video>
+    
+    <br/>
+    <input id="durationVideo" type="range" min="0" value="0"  />
+	<span id="result"></span>
+    <input id="volumeSlider" type="range" min="0" max="100" value=""/>
+    <span id="resultAudio"></span>
+	<div id="controles">
+    	<button id="stop" onclick="stop()">STOP</button>
+        <button id="rew" onclick="skip(-10)">&lt;&lt;</button>
+		<button id="play" onclick="play()"><span>PLAY/PAUSE</span></button>
+        <button id="fastFwd" onclick="skip(10)">&gt;&gt;</button>
+        <button onclick="volume(-0.1)">Vol- </button>
+        <button onclick="volume(+0.1)">Vol+ </button>
+		<button onclick="mute()">Mute</button>
+        <button id="ampliar" onclick="ampliar($(this))">Ampliar</button>
+		<div style="display:block;">
+        <div id="myTime">Tiempo</div>
+        </div>
+	</div>
+	</section>
+    <br><br>
+</body>
+<script>
+</script>
+</html>
